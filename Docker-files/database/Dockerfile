@@ -1,0 +1,6 @@
+mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - devnet
