@@ -11,6 +11,13 @@ services:
       - backend
     networks:
       - devnet
+    # Add healthcheck to ensure the container stays up
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   backend:
     build:
@@ -24,14 +31,29 @@ services:
       - devnet
     depends_on:
       - mongo
+    # Add healthcheck for the backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
 
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
     networks:
       - devnet
+    # Add restart policy for database resilience
+    restart: always
 
 networks:
   devnet:
     driver: bridge
+
+volumes:
+  mongo-data:
+    # Using a named volume to persist database data
